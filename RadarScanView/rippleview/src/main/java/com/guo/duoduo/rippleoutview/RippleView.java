@@ -16,8 +16,7 @@ import android.widget.TextView;
 /**
  * Created by 10129302 on 15-2-12.
  */
-public class RippleView extends TextView
-{
+public class RippleView extends TextView {
 
     private static final String tag = RippleView.class.getSimpleName();
 
@@ -57,37 +56,32 @@ public class RippleView extends TextView
     private Paint mPaint;
     private ObjectAnimator mAnimator;
 
-    public RippleView(Context context)
-    {
+    public RippleView(Context context) {
         super(context);
         initPaint();
         initAnimation();
     }
 
-    public RippleView(Context context, AttributeSet attrs)
-    {
+    public RippleView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initPaint();
         initAnimation();
     }
 
-    public RippleView(Context context, AttributeSet attrs, int defStyleAttr)
-    {
+    public RippleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initPaint();
         initAnimation();
     }
 
-    private void initPaint()
-    {
+    private void initPaint() {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(mRippleColor);
     }
 
-    private void initAnimation()
-    {
+    private void initAnimation() {
         mAnimator = ObjectAnimator.ofInt(this, "currentProgress", 0, 100);
         mAnimator.setRepeatCount(ObjectAnimator.INFINITE);
         mAnimator.setRepeatMode(ObjectAnimator.RESTART);
@@ -96,67 +90,53 @@ public class RippleView extends TextView
         mAnimator.setDuration(mTotalTime);
     }
 
-    public void setMode(int mode)
-    {
+    public void setMode(int mode) {
         this.mode = mode;
     }
 
-    public void startRippleAnimation()
-    {
-        if (!animationRunning)
-        {
+    public void startRippleAnimation() {
+        if (!animationRunning) {
             mAnimator.start();
             animationRunning = true;
         }
     }
 
-    public void stopRippleAnimation()
-    {
-        if (animationRunning)
-        {
+    public void stopRippleAnimation() {
+        if (animationRunning) {
             mAnimator.end();
             animationRunning = false;
         }
     }
 
-    public boolean isRippleAnimationRunning()
-    {
+    public boolean isRippleAnimationRunning() {
         return animationRunning;
     }
 
-    public int getCurrentProgress()
-    {
+    public int getCurrentProgress() {
         return currentProgress;
     }
 
-    public void setCurrentProgress(int currentProgress)
-    {
+    public void setCurrentProgress(int currentProgress) {
         this.currentProgress = currentProgress;
         this.invalidate();
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int resultWidth = 0;
         int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
         int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
-        if (modeWidth == MeasureSpec.EXACTLY)
-        {
+        if (modeWidth == MeasureSpec.EXACTLY) {
             resultWidth = sizeWidth;
-        }
-        else
-        {
+        } else {
             resultWidth = mMinSize;
-            if (modeWidth == MeasureSpec.AT_MOST)
-            {
+            if (modeWidth == MeasureSpec.AT_MOST) {
                 resultWidth = Math.min(resultWidth, sizeWidth);
             }
         }
@@ -164,15 +144,11 @@ public class RippleView extends TextView
         int resultHeight = 0;
         int modeHeight = MeasureSpec.getMode(heightMeasureSpec);
         int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
-        if (modeHeight == MeasureSpec.EXACTLY)
-        {
+        if (modeHeight == MeasureSpec.EXACTLY) {
             resultHeight = sizeHeight;
-        }
-        else
-        {
+        } else {
             resultHeight = mMinSize;
-            if (modeHeight == MeasureSpec.AT_MOST)
-            {
+            if (modeHeight == MeasureSpec.AT_MOST) {
                 resultHeight = Math.min(resultHeight, sizeHeight);
             }
         }
@@ -182,16 +158,14 @@ public class RippleView extends TextView
         mRadius = Math.max(resultWidth, resultHeight) / 2;
 
         Log.d(tag, "ripple out view radius = " + mRadius + "; width =" + resultWidth
-            + "; height = " + resultHeight);
+                + "; height = " + resultHeight);
 
         setMeasuredDimension(resultWidth, resultHeight);
     }
 
     @Override
-    public void onDraw(Canvas canvas)
-    {
-        for (int i = 0; i < mRippleNum; i++)
-        {
+    public void onDraw(Canvas canvas) {
+        for (int i = 0; i < mRippleNum; i++) {
             int progress = (currentProgress + i * 100 / (mRippleNum)) % 100;
             if (mode == 1)
                 progress = 100 - progress;
@@ -203,8 +177,7 @@ public class RippleView extends TextView
     }
 
     @Override
-    protected void onDetachedFromWindow()
-    {
+    protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (isRippleAnimationRunning())
             stopRippleAnimation();
@@ -213,12 +186,10 @@ public class RippleView extends TextView
     /**
      * 自定义估值器
      */
-    private TypeEvaluator mProgressEvaluator = new TypeEvaluator()
-    {
+    private TypeEvaluator mProgressEvaluator = new TypeEvaluator() {
 
         @Override
-        public Object evaluate(float fraction, Object startValue, Object endValue)
-        {
+        public Object evaluate(float fraction, Object startValue, Object endValue) {
             fraction = (fraction * mTotalTime / mPeriod) % 100;
             return fraction;
         }
