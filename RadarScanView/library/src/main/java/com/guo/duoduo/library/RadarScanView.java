@@ -19,11 +19,9 @@ import android.view.View;
  * Created by 郭攀峰 on 2015/8/19.
  */
 public class RadarScanView extends View {
-    private static final int DEFAULT_WIDTH = 300;
-    private static final int DEFAULT_HEIGHT = 300;
 
-    private int defaultWidth;
-    private int defaultHeight;
+    private static int DEFAULT_WIDTH = 300;
+    private static int DEFAULT_HEIGHT = 300;
     private int start;
     private int centerX;
     private int centerY;
@@ -76,6 +74,8 @@ public class RadarScanView extends View {
         centerX = w / 2;
         centerY = h / 2;
         radarRadius = Math.min(w, h);
+        Shader shader = new SweepGradient(centerX, centerY, Color.TRANSPARENT, tailColor);
+        mPaintRadar.setShader(shader);
     }
 
     private void init(AttributeSet attrs, Context context) {
@@ -89,10 +89,6 @@ public class RadarScanView extends View {
         }
 
         initPaint();
-        //得到当前屏幕的像素宽高
-
-        defaultWidth = dip2px(context, DEFAULT_WIDTH);
-        defaultHeight = dip2px(context, DEFAULT_HEIGHT);
 
         matrix = new Matrix();
         handler.post(run);
@@ -108,30 +104,33 @@ public class RadarScanView extends View {
         mPaintRadar = new Paint();
         mPaintRadar.setColor(radarColor);
         mPaintRadar.setAntiAlias(true);
+        //设置颜色渐变从透明到不透明
+        Shader shader = new SweepGradient(centerX, centerY, Color.TRANSPARENT, tailColor);
+        mPaintRadar.setShader(shader);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int resultWidth = 0;
+        int resultWidth;
         int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
         int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
 
         if (modeWidth == MeasureSpec.EXACTLY) {
             resultWidth = sizeWidth;
         } else {
-            resultWidth = defaultWidth;
+            resultWidth = DEFAULT_WIDTH;
             if (modeWidth == MeasureSpec.AT_MOST) {
                 resultWidth = Math.min(resultWidth, sizeWidth);
             }
         }
 
-        int resultHeight = 0;
+        int resultHeight;
         int modeHeight = MeasureSpec.getMode(heightMeasureSpec);
         int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
         if (modeHeight == MeasureSpec.EXACTLY) {
             resultHeight = sizeHeight;
         } else {
-            resultHeight = defaultHeight;
+            resultHeight = DEFAULT_HEIGHT;
             if (modeHeight == MeasureSpec.AT_MOST) {
                 resultHeight = Math.min(resultHeight, sizeHeight);
             }
@@ -150,21 +149,8 @@ public class RadarScanView extends View {
         canvas.drawCircle(centerX, centerY, radarRadius / 3, mPaintCircle);
         canvas.drawCircle(centerX, centerY, 3 * radarRadius / 7, mPaintCircle);
 
-        //设置颜色渐变从透明到不透明
-        Shader shader = new SweepGradient(centerX, centerY, Color.TRANSPARENT, tailColor);
-        mPaintRadar.setShader(shader);
         canvas.concat(matrix);
         canvas.drawCircle(centerX, centerY, 3 * radarRadius / 7, mPaintRadar);
-    }
-
-    private int dip2px(Context context, float dipValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
-    }
-
-    private int px2dip(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
     }
 
 }
